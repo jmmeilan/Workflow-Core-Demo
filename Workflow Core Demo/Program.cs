@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using Workflow_Core_Demo.DependencyInjection;
 using WorkflowCore.Interface;
 
 namespace Workflow_Core_Demo
@@ -11,16 +12,16 @@ namespace Workflow_Core_Demo
             IServiceProvider serviceProvider = ConfigureServices();
 
             var workflowHost = serviceProvider.GetService<IWorkflowHost>();
-            workflowHost.RegisterWorkflow<PassingDataWorkflow, DataClass>();
+            workflowHost.RegisterWorkflow<DependencyInjectionWorkflow>();
             workflowHost.Start();
 
-            DataClass initialData = new DataClass
-            {
-                Value1 = 2,
-                Value2 = 3
-            };
+            //DataClass initialData = new DataClass
+            //{
+            //    Value1 = 2,
+            //    Value2 = 3
+            //};
 
-            workflowHost.StartWorkflow("PassingData", 1, initialData);
+            workflowHost.StartWorkflow("DI", 1, null);
 
             Console.ReadLine();
             
@@ -32,6 +33,8 @@ namespace Workflow_Core_Demo
             IServiceCollection services = new ServiceCollection();
             services.AddLogging();
             services.AddWorkflow();
+            services.AddTransient<DoSomething>();
+            services.AddTransient<IMyService, MyService>();
 
             var serviceProvider = services.BuildServiceProvider();
 
