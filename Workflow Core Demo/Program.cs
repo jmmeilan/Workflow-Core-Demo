@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using Workflow_Core_Demo.DependencyInjection;
+using Workflow_Core_Demo.EventWorkflow;
 using WorkflowCore.Interface;
 
 namespace Workflow_Core_Demo
@@ -12,19 +13,18 @@ namespace Workflow_Core_Demo
             IServiceProvider serviceProvider = ConfigureServices();
 
             var workflowHost = serviceProvider.GetService<IWorkflowHost>();
-            workflowHost.RegisterWorkflow<DependencyInjectionWorkflow>();
+            workflowHost.RegisterWorkflow<EventSampleWorkflow, SampleDataClass>();
             workflowHost.Start();
 
-            //DataClass initialData = new DataClass
-            //{
-            //    Value1 = 2,
-            //    Value2 = 3
-            //};
+            SampleDataClass initialData = new SampleDataClass();
 
-            workflowHost.StartWorkflow("DI", 1, null);
+            var workflowId = workflowHost.StartWorkflow("EventSample", 1, initialData).Result;
+
+            Console.WriteLine("Enter value to publish");
+            string value = Console.ReadLine();
+            workflowHost.PublishEvent("SomeEvent", workflowId, value);
 
             Console.ReadLine();
-            
             workflowHost.Stop();
         }
 
@@ -33,8 +33,6 @@ namespace Workflow_Core_Demo
             IServiceCollection services = new ServiceCollection();
             services.AddLogging();
             services.AddWorkflow();
-            services.AddTransient<DoSomething>();
-            services.AddTransient<IMyService, MyService>();
 
             var serviceProvider = services.BuildServiceProvider();
 
