@@ -26,7 +26,9 @@ namespace Workflow_Core_Demo
         {
             IServiceCollection services = new ServiceCollection();
             services.AddLogging();
-            services.AddWorkflow();
+
+            //services.AddWorkflow();
+            services.AddWorkflow(x => x.UsePostgreSQL(@"Server=127.0.0.1;Port=5432;Database=workflow;User Id=postgres;Password=pass;", true, true));
 
             var serviceProvider = services.BuildServiceProvider();
 
